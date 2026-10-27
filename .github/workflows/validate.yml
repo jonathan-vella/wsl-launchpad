@@ -1,0 +1,30 @@
+name: Validate
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  bash:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check shell syntax and isolated tests
+        run: |
+          bash -n provision.sh tests/test-provision.sh
+          bash tests/test-provision.sh
+          bash -n dotfiles/install.sh dotfiles/tests/install.sh dotfiles/shell/.profile dotfiles/shell/.bashrc
+          bash dotfiles/tests/install.sh
+
+  powershell:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check PowerShell bootstrap
+        shell: pwsh
+        run: |
+          ./tests/test-bootstrap.ps1
+          ./dotfiles/tests/Install.Tests.ps1
