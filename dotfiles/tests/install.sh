@@ -92,7 +92,7 @@ assert "repositioned include remains unique" \
 
 rm "$HOME/.bashrc"
 ln -s "$ROOT/missing" "$HOME/.bashrc"
-"$REPO/install.sh" >/dev/null
+bash "$REPO/install.sh" >/dev/null
 assert_link "$HOME/.bashrc" "$REPO/shell/.bashrc"
 
 printf 'export LAUNCHPAD_DOTFILES_TEST=loaded\n' > "$HOME/.profile.local"
