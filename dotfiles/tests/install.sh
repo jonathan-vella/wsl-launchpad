@@ -55,7 +55,7 @@ else
     printf 'PASS: Bash installer does not configure VS Code settings\n'
 fi
 
-"$REPO/install.sh" >/dev/null
+bash "$REPO/install.sh" >/dev/null
 
 assert_link "$XDG_CONFIG_HOME/dotfiles/gitconfig" "$REPO/git/.gitconfig"
 assert_link "$HOME/.profile" "$REPO/shell/.profile"
@@ -73,7 +73,7 @@ assert "dotfiles config is included before user settings" \
 assert "original user .gitconfig is backed up" \
     test "$(git config --file "$HOME/.gitconfig.bak" core.editor)" = code
 
-"$REPO/install.sh" >/dev/null
+bash "$REPO/install.sh" >/dev/null
 assert "repeat install creates no extra backup" test ! -e "$XDG_CONFIG_HOME/dotfiles/gitconfig.bak.2"
 assert "repeat install creates no extra user config backup" test ! -e "$HOME/.gitconfig.bak.1"
 if [[ "$(uname -s)" != MINGW* && "$(uname -s)" != MSYS* ]]; then
@@ -84,7 +84,7 @@ fi
 : > "$HOME/.gitconfig"
 git config --file "$HOME/.gitconfig" core.editor code
 git config --file "$HOME/.gitconfig" --add include.path "$XDG_CONFIG_HOME/dotfiles/gitconfig"
-"$REPO/install.sh" >/dev/null
+bash "$REPO/install.sh" >/dev/null
 assert "existing include is moved before user settings" \
     test "$(git config --file "$HOME/.gitconfig" --name-only --get-regexp '.*' | sed -n '1p')" = include.path
 assert "repositioned include remains unique" \
