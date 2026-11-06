@@ -205,15 +205,72 @@ there. The recommended VS Code WSL workflow is documented, but remains
 
 ## Optional Microsoft CFS feeds for APEX
 
-Microsoft maintainers using APEX devcontainers can run
-[`configure-cfs.ps1`](configure-cfs.ps1) once to persist their approved feed
-settings for future Windows and WSL sessions. This removes the need to run the
-APEX host launcher on every VS Code launch on that device.
+**Microsoft maintainers using APEX devcontainers:** use this one-time device
+opt-in when your environment requires Microsoft's CFS package feeds.
+**Everyone else:** skip it and keep your organization's approved sources.
+The core bootstrap and dotfiles do not run this helper automatically.
 
-This is **opt-in** and separate from the core bootstrap and dotfiles.
-It does not install packages or change other users' defaults. Follow the
-[Windows and WSL instructions](docs/cfs.md), including preview, activation,
-verification, and removal.
+APEX reads its feed variables from the **Windows VS Code process environment**
+when building a devcontainer. Setting them only in a VS Code integrated
+terminal is too late; an existing VS Code process or container can retain the
+old public-feed defaults. If a build fails downloading from a public package
+host, check the selected feeds and corporate network/VPN access rather than
+disabling TLS verification.
+
+[`configure-cfs.ps1`](configure-cfs.ps1) persists the APEX npm, Python, and
+PowerShell CFS settings for your Windows account and forwards them through
+`WSLENV`. Future sessions can open VS Code normally instead of running APEX's
+host launcher every time. It preserves unrelated forwarding entries and does
+not install packages, change credentials, or globally reconfigure npm or pip.
+The existing APEX launchers remain available for one-off sessions and others.
+This dev-box opt-in is not a substitute for an approved, authenticated CI feed.
+
+### Run once from Windows
+
+Keep Launchpad on a **local Windows disk**, not inside a devcontainer or at a
+WSL/network path. From its folder in **Windows PowerShell 7.4 or newer**,
+preview first, then apply:
+
+```powershell
+pwsh -NoProfile -File .\configure-cfs.ps1 -WhatIf
+pwsh -NoProfile -File .\configure-cfs.ps1
+```
+
+If execution policy blocks the script, use your approved signing/execution
+method; do not bypass the policy.
+
+### Or run once from WSL
+
+Invoke the **same Windows-hosted checkout** using Windows PowerShell 7.
+These examples assume Launchpad is at `$HOME\src\wsl-launchpad` on Windows;
+replace that path if you keep it elsewhere:
+
+```bash
+pwsh.exe -NoProfile -Command '& "$HOME\src\wsl-launchpad\configure-cfs.ps1" -WhatIf'
+pwsh.exe -NoProfile -Command '& "$HOME\src\wsl-launchpad\configure-cfs.ps1"'
+```
+
+The single quotes let Windows PowerShell resolve `$HOME` to your Windows home,
+not your Linux home. If `pwsh.exe` is unavailable in WSL, use Windows instead.
+
+### Activate the settings
+
+Save your work, close VS Code, and **sign out of Windows and back in**.
+If you use WSL, save any remaining work and run this in a new Windows terminal:
+
+```powershell
+wsl.exe --shutdown
+```
+
+This stops **all WSL distributions** without deleting files. Reopen WSL and
+your project normally, then run **Dev Containers: Rebuild Container** once
+for existing APEX containers. A restart alone does not update build-time feeds.
+APEX startup should identify npm, pip, and uv sources as `Microsoft CFS`.
+
+See the [full Windows/WSL guide](docs/cfs.md) for exact variables,
+verification, failure handling, and removal. Network/VPN access is still
+required when your organization requires it; persisting settings does not
+prove that package downloads succeed.
 
 ## Optional dotfiles
 
