@@ -27,4 +27,5 @@ jobs:
         shell: pwsh
         run: |
           ./tests/test-bootstrap.ps1
+          ./tests/test-cfs.ps1
           ./dotfiles/tests/Install.Tests.ps1

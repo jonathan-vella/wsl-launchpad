@@ -203,6 +203,18 @@ The initial Launchpad checkout can stay on Windows because `bootstrap.ps1` runs
 there. The recommended VS Code WSL workflow is documented, but remains
 **unvalidated on Azure Linux 4** here.
 
+## Optional Microsoft CFS feeds for APEX
+
+Microsoft maintainers using APEX devcontainers can run
+[`configure-cfs.ps1`](configure-cfs.ps1) once to persist their approved feed
+settings for future Windows and WSL sessions. This removes the need to run the
+APEX host launcher on every VS Code launch on that device.
+
+This is **opt-in** and separate from the core bootstrap and dotfiles.
+It does not install packages or change other users' defaults. Follow the
+[Windows and WSL instructions](docs/cfs.md), including preview, activation,
+verification, and removal.
+
 ## Optional dotfiles
 
 **Skip this section if you only want the installed tools.** The core bootstrap
