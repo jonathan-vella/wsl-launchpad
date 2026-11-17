@@ -29,6 +29,9 @@ checksum rejection. They do not run WSL or install packages.
 The optional [CFS device setup](cfs.md) has isolated PowerShell tests for
 feed values, bidirectional WSL forwarding, existing user/machine entry
 preservation, reruns, `-WhatIf`, and persistence/verification failures.
+Native-client coverage uses temporary NuGet/Cargo files and mocked repository
+and WSL operations; it checks source preservation, backups, conflicts, and
+explicit distribution targeting without changing the host.
 These tests mock all persistent environment access. They do not prove that a
 real Windows sign-out, WSL restart, devcontainer rebuild, or CFS download succeeds.
 
@@ -39,7 +42,7 @@ real Windows sign-out, WSL restart, devcontainer rebuild, or CFS download succee
 | Existing native x64 Azure Linux 4 core setup and rerun | **Recorded successful** | The source README describes the live run; Launchpad did not reproduce it. |
 | x64/ARM64 release metadata and Microsoft checksum signatures | **Recorded checked** | Windows metadata/signature check only, not installation or native execution. |
 | Isolated PowerShell/Bash tests | **Automated, mocked** | Safe logic/regression coverage; no real WSL, network install, or sign-in. |
-| Optional CFS Windows-user settings and WSL forwarding | **Automated, mocked** | No real user settings are written; activation and feed reachability remain unvalidated. |
+| Optional CFS settings, native client configuration, and WSL forwarding | **Automated, mocked** | Temporary client files only; no real user settings are written. Activation and package restores remain unvalidated. |
 | Fresh x64 `.wsl` installation | **Unvalidated** | No live fresh installation evidence. |
 | Native ARM64 core provisioning | **Unvalidated** | No native ARM64 execution evidence. |
 | Optional dotfiles onboarding/reruns | **Not included** | Core setup does not clone or install dotfiles. |

@@ -203,7 +203,7 @@ The initial Launchpad checkout can stay on Windows because `bootstrap.ps1` runs
 there. The recommended VS Code WSL workflow is documented, but remains
 **unvalidated on Azure Linux 4** here.
 
-## Optional Microsoft CFS feeds for APEX
+## Optional Microsoft CFS feeds
 
 **Microsoft maintainers using APEX devcontainers:** use this one-time device
 opt-in when your environment requires Microsoft's CFS package feeds.
@@ -224,6 +224,24 @@ host launcher every time. It preserves unrelated forwarding entries and does
 not install packages, change credentials, or globally reconfigure npm or pip.
 The existing APEX launchers remain available for one-off sessions and others.
 This dev-box opt-in is not a substitute for an approved, authenticated CI feed.
+
+Add `-ConfigureClients` to also configure native Windows defaults for **npm,
+NuGet, PyPI (pip/uv), PowerShell Gallery, and Cargo**. Add
+`-WslDistribution <name>` to configure the default user in one WSL distribution:
+
+```powershell
+pwsh -NoProfile -File .\configure-cfs.ps1 -ConfigureClients -WslDistribution Ubuntu -WhatIf
+pwsh -NoProfile -File .\configure-cfs.ps1 -ConfigureClients -WslDistribution Ubuntu
+```
+
+Replace `Ubuntu` with your distribution name, or omit `-WslDistribution` for
+Windows-only native setup. Existing files are backed up before editing;
+conflicting Cargo source configuration requires a manual merge. Missing
+PowerShell clients are reported, not installed. These are client defaults,
+not enforcement: private feeds and project overrides remain intact.
+NuGet/Cargo **inside devcontainers** still need their own config mounts or
+template changes; host configuration does not automatically reach them.
+Without these options, the APEX-only behavior below is unchanged.
 
 ### Run once from Windows
 
