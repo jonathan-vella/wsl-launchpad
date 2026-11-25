@@ -1,8 +1,10 @@
 # Microsoft Defender on Windows 11 with WSL
 
 This page gives guidance only. WSL Launchpad does not change Defender, firewall,
-or Intune settings. The guidance has not been tested with Azure Linux 4, which
-is in preview. On a managed device, follow your organization's policy and ask
+or Intune settings. The guidance has not been tested with Azure Linux 4.
+Azure Linux 4 is [generally available](https://techcommunity.microsoft.com/blog/LinuxandOpenSourceBlog/azure-linux-4-is-generally-available/4573381);
+that does not establish Defender compatibility on every WSL configuration.
+On a managed device, follow your organization's policy and ask
 your administrator before changing settings.
 
 ## Personal devices
@@ -11,7 +13,7 @@ your administrator before changing settings.
    protection, and tamper protection on. Do not turn them off to speed up builds.
 2. Keep Windows and WSL current: Windows Update, then `wsl --update`.
 3. Before changing antivirus settings to address slow builds, check the
-   [project storage and toolchain guidance](../README.md#where-to-keep-projects).
+   [project storage and toolchain guidance](performance.md).
 4. Do not add exclusions by default. If a measured slowdown remains, limit any
    justified exclusion to one build or cache folder. Never exclude the entire
    `%LOCALAPPDATA%\Packages` distro store, `wsl.exe`, or a drive.
@@ -19,7 +21,7 @@ your administrator before changing settings.
    Windows Firewall rules apply to WSL automatically.
 6. Treat files as untrusted regardless of whether Defender has scanned them;
    a clean scan is not a guarantee that a file is safe to run.
-7. Never commit tokens. Use the sign-in steps in the README and keep secrets
+7. Never commit tokens. Use the [Linux sign-in steps](setup.md#4-sign-in-inside-linux) and keep secrets
    out of project files.
 
 ## Organization-managed devices

@@ -8,6 +8,10 @@ bootstrap never runs it, and other users keep their existing package sources.
 your **Windows user environment** and forwards them into future WSL sessions.
 This avoids running APEX's host launcher every time you open VS Code on this device.
 The existing APEX launchers remain available for other users and one-off sessions.
+APEX reads these variables from the Windows VS Code process environment when
+building a devcontainer. Setting them only in an integrated terminal is too
+late for that build; a running VS Code process or existing container can retain
+the old feed defaults. This helper does not install the APEX devcontainer stack.
 Add `-ConfigureClients` for native Windows npm, PyPI (pip/uv), NuGet,
 PowerShell Gallery, and Cargo defaults. Add `-WslDistribution <name>` to
 configure native clients for the default user in one WSL distribution as well.

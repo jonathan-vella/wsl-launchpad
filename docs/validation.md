@@ -1,8 +1,10 @@
 # Validation status
 
-Azure Linux 4 is a preview. The upstream `4.0` branch describes it as in
-development. Mocked tests, metadata checks, and an existing-distro run do not
-prove that fresh installs or all architectures work.
+Azure Linux 4 became [generally available on November 17, 2026](https://techcommunity.microsoft.com/blog/LinuxandOpenSourceBlog/azure-linux-4-is-generally-available/4573381).
+Azure Linux on WSL receives [best-effort support](https://learn.microsoft.com/azure/azure-linux/windows-subsystem-for-linux-overview).
+GA describes the upstream release, not Launchpad test coverage. Mocked tests,
+metadata checks, and an existing-distro run do not prove that fresh installs
+or all architectures work.
 
 ## Evidence from the source implementation
 
@@ -57,5 +59,48 @@ they are tested on their target environments.
 
 ## Upstream references
 
-- [Azure Linux 4 upstream README](https://github.com/microsoft/azurelinux/blob/4.0/README.md): status and WSL package links.
+- [Azure Linux 4 GA announcement](https://techcommunity.microsoft.com/blog/LinuxandOpenSourceBlog/azure-linux-4-is-generally-available/4573381): release status.
+- [Azure Linux on WSL](https://learn.microsoft.com/azure/azure-linux/windows-subsystem-for-linux-overview): downloads and support scope.
+- [Azure Linux 4 upstream README](https://github.com/microsoft/azurelinux/blob/4.0/README.md): source and WSL package links.
 - [Microsoft WSL image signature and checksum procedure](https://github.com/microsoft/azurelinux/blob/4.0/docs/verify-wsl-signature-and-checksum.md).
+
+## Download verification
+
+For a fresh install, the signed checksum must come from Microsoft's trusted
+key with fingerprint
+`2BC9 4FFF 7015 A5F2 8F15 37AD 0CD9 FED3 3135 CE90`. The image must match
+the architecture-specific checksum in that manifest. The fingerprint is a
+trust anchor, not a version pin. If the key changes, verification stops
+until the new key is reviewed independently.
+
+Bicep and Copilot CLI downloads require official release URLs and SHA-256
+digests from the official release API. The bootstrap does not use a GitHub
+token or authenticated download header. Never bypass signature or checksum
+verification to get past a setup failure.
+
+## Safe local checks
+
+Run commands from the repository root, not the `docs` directory. These tests
+use temporary fixtures and mock WSL, network, GPG, release responses, and
+device settings. They do not provision WSL, install packages, sign in, or
+apply dotfiles to your actual user.
+
+In Windows PowerShell 7.4 or newer:
+
+```powershell
+pwsh -NoProfile -File .\tests\test-bootstrap.ps1
+pwsh -NoProfile -File .\tests\test-cfs.ps1
+pwsh -NoProfile -File .\dotfiles\tests\Install.Tests.ps1
+```
+
+Inside Linux:
+
+```bash
+bash -n provision.sh tests/test-provision.sh
+bash tests/test-provision.sh
+bash -n dotfiles/install.sh dotfiles/tests/install.sh
+bash dotfiles/tests/install.sh
+```
+
+The Bash dotfiles tests need symlink support and run on Linux and macOS.
+On Git Bash, the suite skips if it cannot create symlinks.

@@ -1,7 +1,8 @@
 # WSL performance cheat sheet
 
-Azure Linux 4 is a preview. These workflow recommendations have not been
-measured on this distribution.
+Azure Linux 4 is [generally available](https://techcommunity.microsoft.com/blog/LinuxandOpenSourceBlog/azure-linux-4-is-generally-available/4573381).
+These workflow recommendations have not been measured on this distribution.
+See [validation status](validation.md) for Launchpad's remaining evidence gaps.
 
 ## Put the working files with the tools
 
@@ -33,6 +34,11 @@ Install VS Code on Windows with the WSL extension. Run `code .` from the WSL
 project directory and check that VS Code connects to `AzureLinux-4`. Run
 language, build, and debug extensions in WSL when they use Linux tools. Keep
 editor UI extensions on Windows.
+
+The initial Windows Launchpad checkout can stay on Windows because
+`bootstrap.ps1` runs there. Linux projects and a linked dotfiles checkout
+belong in the Linux filesystem. This project's VS Code WSL workflow remains
+unvalidated on Azure Linux 4; upstream instructions are not local test evidence.
 
 ## Don't trade security for speed
 
