@@ -25,13 +25,13 @@ cd ~/src
 ```
 
 To browse Linux files from Windows, run `explorer.exe .` from the WSL project
-or open `\\wsl$\AzureLinux-4` in File Explorer. This does not change which
+or open `\\wsl$\AzureLinux-4-GA` in File Explorer. This does not change which
 filesystem the tools use.
 
 ## Keep the editor and toolchain aligned
 
 Install VS Code on Windows with the WSL extension. Run `code .` from the WSL
-project directory and check that VS Code connects to `AzureLinux-4`. Run
+project directory and check that VS Code connects to `AzureLinux-4-GA`. Run
 language, build, and debug extensions in WSL when they use Linux tools. Keep
 editor UI extensions on Windows.
 

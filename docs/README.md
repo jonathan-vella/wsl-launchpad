@@ -6,10 +6,12 @@ Launchpad's own evidence and remaining gaps are listed in [validation status](va
 
 ## Start here
 
-Follow [setup](setup.md) to prepare Windows, install or reuse AzureLinux-4,
+Follow [setup](setup.md) to prepare Windows, install or reuse AzureLinux-4-GA,
 verify the tools, and sign in from Linux. Commands are labeled by the
 environment where they run. You do not need an existing Linux account or
 a fork of Launchpad.
+Launchpad checks GA branding and Microsoft production feeds before provisioning.
+An existing beta distro named `AzureLinux-4` remains separate and untouched.
 
 | Task | Guide |
 |---|---|

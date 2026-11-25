@@ -2,7 +2,7 @@
 
 The bootstrap can resume after a failure. Fix the reported problem, then rerun
 the same command with the same Linux username. It does not reset or recreate
-`AzureLinux-4`.
+`AzureLinux-4-GA`.
 
 If file access is slow, check the [project location and toolchain](performance.md)
 first. Then see the [Defender guidance](defender.md). Do not disable Defender
@@ -32,15 +32,15 @@ Check `cat /etc/os-release` inside Linux for the OS series and
 `uname -m` for architecture. The [setup guide](setup.md#3-verify-and-open-linux)
 lists expected tool and timer results.
 
-- **AzureLinux-4 uses WSL 1:** review and back it up first. If you choose to
-  convert it, run `wsl --set-version AzureLinux-4 2` manually and rerun. The
+- **AzureLinux-4-GA uses WSL 1:** review and back it up first. If you choose to
+  convert it, run `wsl --set-version AzureLinux-4-GA 2` manually and rerun. The
   bootstrap does not convert it.
 - **Architecture mismatch:** do not force provisioning. The existing distro
   architecture must match the native Windows architecture; use a matching
   distro or make a separate, informed decision about the environment.
 - **systemd is not PID 1:** preserve the other sections in
   `/etc/wsl.conf`, set `[boot] systemd=true`, exit sessions, and restart only
-  AzureLinux-4 with `wsl --terminate AzureLinux-4`. Then rerun. The bootstrap
+  AzureLinux-4-GA with `wsl --terminate AzureLinux-4-GA`. Then rerun. The bootstrap
   does not edit this file or run `wsl --shutdown`.
 - **Linux user rejected:** use an explicit non-root username matching the
   documented Linux account format. An existing account must have UID >=1000
@@ -50,6 +50,13 @@ lists expected tool and timer results.
   network, or configuration problem and rerun. A newly installed distro may
   remain registered after a later failure; the bootstrap reuses it and does
   not recreate it.
+- **GA check failed:** the target must have Azure Linux 4.0 identity without
+  beta/preview branding and enabled Microsoft production base and Microsoft
+  feeds. A `-GA` name alone is insufficient. Custom or beta Azure Linux feeds
+  are rejected before package or account changes. Launchpad does not rewrite
+  them. Follow [beta-to-GA setup](maintenance.md#moving-from-a-beta-installation)
+  for an old `AzureLinux-4`; investigate a conflicting `AzureLinux-4-GA`
+  without unregistering or deleting its data.
 
 ## Startup issues
 
@@ -93,8 +100,8 @@ Ubuntu:
 
 ```powershell
 wsl --terminate Ubuntu
-wsl --terminate AzureLinux-4
-wsl -d AzureLinux-4 --cd "~"
+wsl --terminate AzureLinux-4-GA
+wsl -d AzureLinux-4-GA --cd "~"
 ```
 
 These commands stop all processes in the named distros without deleting files.

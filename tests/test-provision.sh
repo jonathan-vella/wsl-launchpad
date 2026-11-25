@@ -6,6 +6,50 @@ work=$(mktemp -d)
 trap 'rm -rf -- "$work"' EXIT
 check() { "$@" || fail "Test failed: $*"; }
 
+# GA checks run without package installs, account changes, or host configuration.
+mkdir -p "$work/repositories"
+cat > "$work/os-release" <<'EOF'
+ID=azurelinux
+VERSION_ID=4.0
+PRETTY_NAME="Azure Linux 4.0"
+EOF
+for channel in base microsoft; do
+    file=azurelinux
+    [[ "$channel" != microsoft ]] || file=microsoft
+    cat > "$work/repositories/$file.repo" <<EOF
+[azurelinux-$channel]
+baseurl=https://packages.microsoft.com/azurelinux/4/prod/$channel/\$basearch
+enabled=1
+EOF
+done
+check assert_ga_release "$work/os-release" "$work/repositories"
+cp "$work/os-release" "$work/ga-release"
+printf 'PRETTY_NAME="Azure Linux 4.0 (WSL Beta)"\n' >> "$work/os-release"
+if (assert_ga_release "$work/os-release" "$work/repositories") > "$work/beta.log" 2>&1; then
+    fail 'Accepted beta branding with production repositories'
+fi
+check grep -q 'beta/preview' "$work/beta.log"
+cp "$work/ga-release" "$work/os-release"
+cp "$work/repositories/azurelinux.repo" "$work/ga-repository"
+sed 's@/4/prod/@/4.0/beta/@' "$work/ga-repository" > "$work/repositories/azurelinux.repo"
+if (assert_ga_release "$work/os-release" "$work/repositories") > "$work/feed.log" 2>&1; then
+    fail 'Accepted beta feeds with GA branding'
+fi
+check grep -q 'production feed' "$work/feed.log"
+cp "$work/ga-repository" "$work/repositories/azurelinux.repo"
+printf '\n[azurelinux-base]\nbaseurl=https://packages.microsoft.com/azurelinux/4/prod/base/$basearch\nenabled=1\n' >> "$work/repositories/azurelinux.repo"
+if (assert_ga_release "$work/os-release" "$work/repositories") > "$work/duplicate.log" 2>&1; then
+    fail 'Accepted duplicate base repository declarations'
+fi
+cp "$work/ga-repository" "$work/repositories/azurelinux.repo"
+sed 's/enabled=1/enabled=0/' "$work/repositories/microsoft.repo" > "$work/disabled.repo"
+if (assert_ga_repository "$work/disabled.repo" azurelinux-microsoft microsoft) > "$work/disabled.log" 2>&1; then
+    fail 'Accepted a disabled production repository'
+fi
+if (assert_ga_release "$work/os-release" "$work/missing") > "$work/missing.log" 2>&1; then
+    fail 'Accepted missing production repositories'
+fi
+
 mkdir -p "$work/etc"
 cat > "$work/etc/automatic.conf" <<'EOF'
 # Existing administrator settings

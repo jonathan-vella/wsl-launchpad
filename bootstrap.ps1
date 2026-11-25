@@ -8,7 +8,7 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
-$Distro = 'AzureLinux-4'
+$Distro = 'AzureLinux-4-GA'
 $Wsl = "$env:WINDIR\System32\wsl.exe"
 
 function Invoke-Wsl {
@@ -173,8 +173,8 @@ function Invoke-Bootstrap {
         }
     }
     $list = ((Invoke-Wsl -Arguments @('--list', '--verbose')) -join "`n") -replace "`0", ''
-    if ($list -notmatch '(?m)^\s*\*?\s*AzureLinux-4\s+.+?\s+2\s*$') {
-        throw 'AzureLinux-4 is not WSL 2. Convert it explicitly with wsl --set-version AzureLinux-4 2, then rerun.'
+    if ($list -notmatch "(?m)^\s*\*?\s*$([regex]::Escape($Distro))\s+.+?\s+2\s*$") {
+        throw "$Distro is not WSL 2. Convert it explicitly with wsl --set-version $Distro 2, then rerun."
     }
     Invoke-Wsl -Arguments @('-d', $Distro, '-u', 'root', '--exec', '/usr/bin/env', '-i',
         'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', '/bin/bash', '-s', '--',

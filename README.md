@@ -24,10 +24,12 @@ pwsh -NoProfile -File .\bootstrap.ps1 -LinuxUser devuser
 Requires native x64 or ARM64 Windows, WSL 2.6.0 or newer, and GnuPG for a
 fresh image install. Launchpad does not install WSL or reboot Windows.
 
-The bootstrap installs AzureLinux-4 if missing, otherwise reuses it. It
+The bootstrap installs AzureLinux-4-GA if missing, otherwise checks and reuses it. It
 installs or updates Linux tools, enables weekly RPM updates, and creates the
-chosen user if needed. **It makes AzureLinux-4 and that user the WSL defaults.**
+chosen user if needed. **It makes AzureLinux-4-GA and that user the WSL defaults.**
 It does not delete other distributions, sign you in, or apply dotfiles.
+Beta/preview branding or non-production Azure Linux feeds stop provisioning.
+An older `AzureLinux-4` distro is left untouched; no beta-to-GA migration is run.
 
 ## Documentation
 

@@ -1,7 +1,7 @@
 # Set up Azure Linux 4 on WSL
 
 Launchpad runs first in Windows PowerShell 7, then installs native tools
-inside AzureLinux-4. You do not need to install Azure Linux or create its
+inside AzureLinux-4-GA. You do not need to install Azure Linux or create its
 user beforehand. Azure Linux 4 is
 [generally available](https://techcommunity.microsoft.com/blog/LinuxandOpenSourceBlog/azure-linux-4-is-generally-available/4573381).
 WSL receives [best-effort support](https://learn.microsoft.com/azure/azure-linux/windows-subsystem-for-linux-overview);
@@ -56,15 +56,24 @@ A pending Windows servicing reboot stops setup.
 
 ## What the bootstrap changes
 
-It installs a signature- and checksum-verified AzureLinux-4 distro if missing,
-or reuses the existing one. It installs or updates native Linux tools, enables
+It installs a signature- and checksum-verified AzureLinux-4-GA distro if missing,
+or checks and reuses the existing one. It installs or updates native Linux tools, enables
 weekly RPM updates, and creates your chosen Linux user if needed.
-**AzureLinux-4 becomes the default WSL distribution, and your chosen user
+**AzureLinux-4-GA becomes the default WSL distribution, and your chosen user
 becomes its default account.** This changes what a plain `wsl` command opens.
 
 It does not remove, stop, convert, or recreate existing distributions, sign
 you in, copy Windows credentials, or apply dotfiles. Ubuntu and Docker's
-distributions remain installed. Existing AzureLinux-4 data is not reset.
+distributions remain installed. An older `AzureLinux-4` distro is left untouched.
+Launchpad does not migrate its files, accounts, credentials, or beta repositories.
+
+Before provisioning, Launchpad checks Azure Linux 4.0 identity, rejects
+beta/preview branding, and requires the enabled `azurelinux-base` and
+`azurelinux-microsoft` feeds to use Microsoft's `/azurelinux/4/prod/` endpoints.
+The name alone is not proof of GA. A beta image registered as AzureLinux-4-GA
+is rejected before package installation, user creation, or default changes.
+Custom Azure Linux feed URLs require an explicit review; Launchpad does not
+silently treat them as GA or rewrite them.
 
 ## 1. Get a local copy
 
@@ -110,7 +119,7 @@ Successful setup ends with:
 
 ```text
 Core setup verified. Sign-ins and optional dotfiles remain separate human steps.
-Open: wsl -d AzureLinux-4 -u devuser
+Open: wsl -d AzureLinux-4-GA -u devuser
 ```
 
 If setup fails, fix the reported problem and rerun with the same username.
@@ -122,17 +131,17 @@ In Windows PowerShell 7:
 
 ```powershell
 wsl --list --verbose
-wsl -d AzureLinux-4 --exec whoami
+wsl -d AzureLinux-4-GA --exec whoami
 ```
 
-Expect an asterisk beside AzureLinux-4, `2` in its VERSION column, and your
+Expect an asterisk beside AzureLinux-4-GA, `2` in its VERSION column, and your
 chosen username from `whoami`. That column is the WSL version, not the
 Azure Linux release. To check the OS from Linux, read `/etc/os-release`.
 
 Open a Linux shell in your home directory:
 
 ```powershell
-wsl -d AzureLinux-4 -u devuser --cd "~"
+wsl -d AzureLinux-4-GA -u devuser --cd "~"
 ```
 
 If the first interactive launch asks you to create an account and then says
@@ -182,7 +191,7 @@ Setting a password does not grant administrator access. For occasional
 administration, open a root shell from Windows PowerShell:
 
 ```powershell
-wsl -d AzureLinux-4 -u root --cd "~"
+wsl -d AzureLinux-4-GA -u root --cd "~"
 ```
 
 Use it only for administrative tasks and run `exit` afterwards. Run normal
@@ -190,7 +199,7 @@ development, sign-ins, and dotfiles installers as your non-root user.
 To set that user's password interactively from Windows PowerShell:
 
 ```powershell
-wsl -d AzureLinux-4 -u root -- passwd devuser
+wsl -d AzureLinux-4-GA -u root -- passwd devuser
 ```
 
 ## Next tasks

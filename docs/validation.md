@@ -27,6 +27,11 @@ The migrated tests use mocks and temporary fixtures. They cover release
 selection and digests, signed-image validation, WSL command transport and
 orchestration, failure handling, reruns, configuration preservation, and
 checksum rejection. They do not run WSL or install packages.
+GA-target regression tests cover side-by-side installation when the older
+`AzureLinux-4` exists, WSL-version checking against `AzureLinux-4-GA`, and
+unchanged defaults after a rejected target. Linux fixtures check GA identity,
+production feeds, and rejection of beta branding, beta URLs, duplicate sections,
+disabled feeds, and missing repository files. These are not live GA install evidence.
 
 The optional [CFS device setup](cfs.md) has isolated PowerShell tests for
 feed values, bidirectional WSL forwarding, existing user/machine entry
@@ -62,6 +67,7 @@ they are tested on their target environments.
 - [Azure Linux 4 GA announcement](https://techcommunity.microsoft.com/blog/LinuxandOpenSourceBlog/azure-linux-4-is-generally-available/4573381): release status.
 - [Azure Linux on WSL](https://learn.microsoft.com/azure/azure-linux/windows-subsystem-for-linux-overview): downloads and support scope.
 - [Azure Linux 4 upstream README](https://github.com/microsoft/azurelinux/blob/4.0/README.md): source and WSL package links.
+- [Azure Linux production base feed](https://github.com/microsoft/azurelinux/blob/4.0/base/comps/azurelinux-repos/azurelinux.repo) and [Microsoft feed](https://github.com/microsoft/azurelinux/blob/4.0/base/comps/azurelinux-repos/microsoft.repo): GA repository templates checked by Launchpad.
 - [Microsoft WSL image signature and checksum procedure](https://github.com/microsoft/azurelinux/blob/4.0/docs/verify-wsl-signature-and-checksum.md).
 
 ## Download verification

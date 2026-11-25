@@ -85,11 +85,48 @@ Persistent=true
 EOF
 }
 
+assert_ga_repository() {
+    local file=$1 section=$2 channel=$3
+    [[ -r "$file" ]] || fail "Missing Azure Linux GA repository file: $file; no changes made."
+    awk -v section="$section" -v expected="https://packages.microsoft.com/azurelinux/4/prod/$channel/\$basearch" '
+        /^[[:space:]]*[#;]/ { next }
+        /^[[:space:]]*\[/ {
+            name=$0
+            sub(/^[[:space:]]*\[/, "", name)
+            sub(/\][[:space:]]*([#;].*)?$/, "", name)
+            inside=(name == section)
+            if (inside) count++
+            next
+        }
+        inside && /=/ {
+            key=$0; sub(/=.*/, "", key); gsub(/[[:space:]]/, "", key)
+            value=$0; sub(/^[^=]*=[[:space:]]*/, "", value)
+            sub(/[[:space:]]+[#;].*$/, "", value); sub(/[[:space:]]+$/, "", value)
+            if (key == "baseurl") { sub(/\/$/, "", value); url=value; urls++ }
+            if (key == "enabled") { enabled=value; enables++ }
+            if (key == "mirrorlist" || key == "metalink") alternate=1
+        }
+        END { exit !(count == 1 && urls == 1 && url == expected &&
+                     enables == 1 && enabled == "1" && !alternate) }
+    ' "$file" || fail "Expected enabled Microsoft production feed [$section] in $file. Beta/preview or custom feeds are not supported; no changes made."
+}
+
+assert_ga_release() {
+    local os_release=${1:-/etc/os-release} repositories=${2:-/etc/yum.repos.d}
+    local ID='' VERSION_ID='' PRETTY_NAME=''
+    [[ -r "$os_release" ]] || fail 'Missing OS release information; no changes made.'
+    source "$os_release"
+    [[ "$ID" == azurelinux && "$VERSION_ID" == 4.0 ]] || fail 'Expected native Azure Linux 4.0 GA; no changes made.'
+    [[ ! "${PRETTY_NAME,,}" =~ (^|[^a-z])(alpha|beta|preview|prerelease|development|rc[0-9]*)([^a-z]|$) ]] ||
+        fail 'Azure Linux beta/preview installations are not supported. Install the GA image separately; no changes made.'
+    assert_ga_repository "$repositories/azurelinux.repo" azurelinux-base base
+    assert_ga_repository "$repositories/microsoft.repo" azurelinux-microsoft microsoft
+}
+
 provision_system() {
     local user=$1 expected_arch=$2 bicep_version=$3 bicep_hash=$4 copilot_version=$5 copilot_hash=$6 arch work
     [[ "$EUID" -eq 0 ]] || fail 'System phase requires WSL root.'
-    source /etc/os-release
-    [[ "$ID" == azurelinux && "$VERSION_ID" == 4.0 ]] || fail 'Expected native Azure Linux 4.0; no changes made.'
+    assert_ga_release
     case "$(uname -m)" in
         x86_64) arch=x64 ;;
         aarch64) arch=arm64 ;;

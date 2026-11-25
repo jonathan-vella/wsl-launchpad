@@ -119,6 +119,7 @@ try {
     $script:calls = [Collections.Generic.List[object]]::new()
     $script:existing = $true
     $script:failSystem = $false
+    $script:failGa = $false
     $script:wslVersion = 2
     function Invoke-Wsl {
         param([string[]]$Arguments, [string]$InputText)
@@ -126,12 +127,18 @@ try {
         switch ($Arguments[0]) {
             '--list' {
                 if ($Arguments[1] -eq '--quiet') {
-                    if ($script:existing) { "AzureLinux-4`0"; 'Ubuntu'; 'docker-desktop' }
-                } else { "* AzureLinux-4 Running $script:wslVersion" }
+                    if ($script:existing) { "AzureLinux-4-GA`0" }
+                    "AzureLinux-4`0"; 'Ubuntu'; 'docker-desktop'
+                } else {
+                    "* AzureLinux-4 Running 2"
+                    "  AzureLinux-4-GA Running $script:wslVersion"
+                }
             }
             '-d' {
+                Assert-True ($Arguments[1] -eq 'AzureLinux-4-GA') 'Provisioning must target the GA distro, not the legacy beta distro.'
                 Assert-True ($Arguments[5] -eq '/usr/bin/env' -and $Arguments[6] -eq '-i') 'Linux must start with a clean environment.'
                 Assert-True ($InputText -match 'provision_system') 'Expected the real helper as stdin.'
+                if ($script:failGa) { throw 'Mock GA validation failure' }
                 if ('system' -in $Arguments -and $script:failSystem) { throw 'Mock system failure' }
             }
         }
@@ -145,6 +152,8 @@ try {
     $script:existing = $false
     Invoke-Bootstrap
     Assert-True (@($calls | Where-Object { $_[0] -eq '--install' }).Count -eq 1) 'Missing distro must install exactly once.'
+    $installCall = @($calls | Where-Object { $_[0] -eq '--install' })[0]
+    Assert-True ($installCall[4] -eq 'AzureLinux-4-GA') 'The GA image must install alongside the existing beta distro.'
     Assert-True (-not (Test-Path (Join-Path $testDirectory 'download'))) 'Temporary image must be cleaned up.'
 
     $calls.Clear()
@@ -158,6 +167,13 @@ try {
     $script:wslVersion = 1
     Assert-Throws { Invoke-Bootstrap } 'not WSL 2'
     Assert-True (@($calls | Where-Object { $_[0] -eq '-d' }).Count -eq 0) 'WSL 1 must not be provisioned.'
+
+    $calls.Clear()
+    $script:wslVersion = 2
+    $script:failGa = $true
+    Assert-Throws { Invoke-Bootstrap } 'Mock GA validation failure'
+    Assert-True (@($calls | Where-Object { $_[0] -in @('--manage', '--set-default') }).Count -eq 0) 'GA rejection must not change WSL defaults.'
+    $script:failGa = $false
 
     $script:wslVersion = 2
     $calls.Clear()
